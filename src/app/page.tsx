@@ -1,5 +1,6 @@
 import ChatLayout from "@/components/chat/ChatLayout";
 import PreferencesTab from "@/components/PreferencesTab";
+import { redis } from "@/lib/db";
 import { cookies } from "next/headers";
 
 export default function Home() {
