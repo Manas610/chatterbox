@@ -1,18 +1,39 @@
-import React from 'react'
+import React, { useEffect, useRef } from 'react'
 import {AnimatePresence , motion} from "framer-motion"
-import { messages, USERS } from '@/db/dummy'
 import { cn } from '@/lib/utils'
 import { Avatar, AvatarImage } from '../ui/avatar'
+import { useSelectedUser } from '@/store/useSelectedUser'
+import { useKindeBrowserClient } from '@kinde-oss/kinde-auth-nextjs'
+import { useQuery } from '@tanstack/react-query'
+import { getMessages } from '@/actions/message.actions'
+import MessageSkeleton from '../skeleton/MessageSkeleton'
 
 const MessageList = () => {
-  const selectedUser = USERS[0]
-  const currentUser = USERS[1]
+  const {selectedUser} = useSelectedUser()
+  const {user:currentUser,isLoading:isUserLoading} = useKindeBrowserClient()
+  const messageContainerRef = useRef<HTMLDivElement>(null)
+
+  const {data:messages , isLoading:isMessagesLoading} = useQuery({
+    queryKey: ["messages" , selectedUser?.id],
+    queryFn: async () => {
+      if(selectedUser && currentUser){
+        return await getMessages(selectedUser?.id , currentUser?.id)
+      }
+    },
+    enabled: !!selectedUser && !!currentUser && !isUserLoading
+  })
+
+  useEffect(() => {
+    if(messageContainerRef.current){
+      messageContainerRef.current.scrollTop = messageContainerRef.current?.scrollHeight
+    }
+    } , [messages])
 
   return (
-    <div className='w-full overflow-y-auto overflow-x-hidden h-full flex flex-col'>
+    <div ref={messageContainerRef} className='w-full overflow-y-auto overflow-x-hidden h-full flex flex-col'>
       {/* This component ensures that an animation is added when item is added or removed from the list */}
       <AnimatePresence>
-        {messages.map((message , index) => (
+        {!isMessagesLoading && messages?.map((message , index) => (
           <motion.div
             key={index}
             layout
@@ -59,7 +80,7 @@ const MessageList = () => {
 								{message.senderId === currentUser?.id && (
 									<Avatar className='flex justify-center items-center'>
 										<AvatarImage
-											src={currentUser?.image || "/user-placeholder.png"}
+											src={currentUser?.picture || "/user-placeholder.png"}
 											alt='User Image'
 											className='border-2 border-white rounded-full'
 										/>
@@ -68,6 +89,13 @@ const MessageList = () => {
 							</div>
           </motion.div>
         ))}
+
+        {isMessagesLoading && (
+          <>
+            <MessageSkeleton />
+            <MessageSkeleton />
+          </>
+        )}
       </AnimatePresence>
     </div>
   )
