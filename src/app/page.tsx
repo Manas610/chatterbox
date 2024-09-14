@@ -26,9 +26,10 @@ async function getUser(): Promise<User[]> {
     const users:User[] = []
 
     for(const user of results) {
-      // if(user.id !== currentUser?.id){
+      //exclude yourself
+      if(user.id !== currentUser?.id){
         users.push(user)
-      // }
+      }
     }
     return users
 }
