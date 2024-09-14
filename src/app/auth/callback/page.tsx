@@ -3,7 +3,6 @@ import { checkAuthStatus } from '@/actions/auth.actions'
 import { useQuery } from '@tanstack/react-query'
 import { Loader } from 'lucide-react'
 import { useRouter } from 'next/navigation'
-import React from 'react'
 
 const Page = () => {
 
