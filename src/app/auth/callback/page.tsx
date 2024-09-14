@@ -4,7 +4,7 @@ import { useQuery } from '@tanstack/react-query'
 import { Loader } from 'lucide-react'
 import { useRouter } from 'next/navigation'
 
-const Page = () => {
+const CallbackPage = () => {
 
   const router = useRouter()
   const {data} = useQuery({
@@ -27,4 +27,4 @@ const Page = () => {
   )
 }
 
-export default Page
+export default CallbackPage
